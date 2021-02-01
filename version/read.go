@@ -157,6 +157,9 @@ var (
 )
 
 func findCryptoSigs(v *Version, f exe) error {
+	int nrOfBoringSigs = 0
+	int nrOfFipsOnlySigs = 0
+	int nrOfStandardSigs = 0
 	const maxSigLen = 1 << 10
 	start, end := f.TextRange()
 	for addr := start; addr < end; {
@@ -170,18 +173,24 @@ func findCryptoSigs(v *Version, f exe) error {
 		}
 		if haveSig(data, sigBoringCrypto) {
 			v.BoringCrypto = true
+			nrOfBoringSigs++
 		}
 		if haveSig(data, sigFIPSOnly) {
 			v.FIPSOnly = true
+			nrOfFipsOnlySigs++
 		}
 		if haveSig(data, sigStandardCrypto) {
 			v.StandardCrypto = true
+			nrOfStandardSigs++
 		}
 		if addr+size < end {
 			size -= maxSigLen
 		}
 		addr += size
 	}
+	fmt.Fprintf('Number of boringcrypto signatures: %v', nrOfBoringSigs)
+	fmt.Fprintf('Number of fipsonly signatures: %v', nrOfFipsOnlySigs)
+	fmt.Fprintf('Number of standard signatures: %v', nrOfStandardSigs)
 	return nil
 }
 
